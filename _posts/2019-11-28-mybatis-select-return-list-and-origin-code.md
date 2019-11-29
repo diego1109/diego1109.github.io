@@ -4,6 +4,7 @@ title:  "Mybatis select 查询返回值为List集合+源码"
 date:   2019-11-27 20:04:09 +0800
 categories: Mybatis
 tags: Mybatis
+comments: true
 ---
 
 对mysql做查询的时候返回值经常是个`List<object>`，在mapper.xml对应的statement中有时候是`resultType`有时候却是`resultMap`。傻傻分不清楚所以总是去找以前的代码看看是怎么写的，等花时间整理的这块的时候才发现用哪个其实很简单，几分钟就能理清楚。[博客中提到的查询场景在源码的测试中都有对应](https://pan.baidu.com/s/1UG9YPDohEFBPtP-3fnOpOQ)。
