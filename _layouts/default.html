@@ -11,5 +11,12 @@
       {{ content }}
     </div>
 
+    <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+    <script src="/public/jquery.toc.js"></script>
+    <script>
+      $('.content .post-content').toc({
+        minItemsToShowToc: 1
+      });
+    </script>
   </body>
 </html>
