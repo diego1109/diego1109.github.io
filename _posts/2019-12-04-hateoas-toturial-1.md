@@ -3,7 +3,7 @@ layout: post
 title: HATEOAS Link在Spring Boot中的使用（一）
 date: 2019-12-04
 categories: 学习笔记
-tags: Spring boot
+tags: SpringBoot
 comments: true
 ---
 
@@ -145,3 +145,10 @@ Link link = linkTo(methodOn(CustomerController.class).getOrdersForCustomer(custo
 
 
 写东西真的好费时间，这种感觉一直都没有变过。把脑海中的零碎片段梳理一下很多时候都要再查资料并且做实验的，不过好处是当这些都弄完的时候我觉着自己的认知更加清楚了些，这也许就是沉淀吧。骑着蜗牛继续向前跑~
+
+
+
+参考文档：
+
+[https://www.baeldung.com/spring-hateoas-tutorial](https://www.baeldung.com/spring-hateoas-tutorial)
+
