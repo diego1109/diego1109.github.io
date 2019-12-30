@@ -93,7 +93,7 @@ saved_model
             method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
   ```
 
-  接下来只需要给prediction_signature配上key构建个map怼到对应的参数上去就行了。
+  接下来只需要给prediction_signature配上key（这个key叫做signature_def）构建个map怼到对应的参数上去就行了。
 
   ```python
   builder.add_meta_graph_and_variables(...,
@@ -101,7 +101,27 @@ saved_model
         legacy_init_op=legacy_init_op)
   ```
 
-  
+最后用命令行工具saved_model_cli可以查看下我们保存好的SavedModel：
+
+```shell
+saved_model_cli show --dir ./savedModel/1/ --tag_set serve --signature_def prediction
+```
+
+结果如下：
+
+```shell
+The given SavedModel SignatureDef contains the following input(s):
+  inputs['input'] tensor_info:
+      dtype: DT_FLOAT
+      shape: (-1, 3)
+      name: Placeholder:0
+The given SavedModel SignatureDef contains the following output(s):
+  outputs['output'] tensor_info:
+      dtype: DT_FLOAT
+      shape: (-1, 1)
+      name: add:0
+Method name is: tensorflow/serving/predict
+```
 
 整个SavedModel的制作过程到现在算是介绍完了，不过还需要再加点东西这块才算比较全面些：
 
