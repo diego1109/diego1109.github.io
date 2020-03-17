@@ -9,26 +9,56 @@ comments: true
 
 ---
 
-工作中遇到个场景需要批量更新表中的记录。当时很明确了，在业务代码里使用循环更新这种方式肯定不可取的，频繁连接数据库是个糟糕的设计。所以就想到批量更新，只连接一次数据库，逐条更新的操作放到数据库里面去执行。中途遇到了些小问题，不过都解决了。
+工作中遇到个场景需要批量更新表中的记录。当时很明确了，在业务代码里使用循环更新这种方式肯定不可取的，频繁连接数据库是个糟糕的设计。所以就想到批量更新，只连接一次数据库，逐条更新的操作放到数据库里面去执行。即便已经意识到了多次连接会造成效率下降，但还需要对场景再考虑下，选择适合的方式下手。
 
-# 方式一
+# 使用场景
+
+在需要批量更新时，就查询条件相对于更新的对象而言，有**一对多**和**多个一对一**两种的场景。
+场景1：老师要给全班所有学生的数学成绩加10分，用老师Id作为查询条件就可以查出全班所有的同学，“每个同学的数学成绩加10分”表示所有查询出来的对象要更新的值是一样的。
+场景2：老师要更新每个同学的数学成绩，这种场景下老师Id就不可能在作为查询条件了，送入的参数应该是个对象列表，每个对象中包含学生Id和他的数学成绩。查询条件应该是个for循环的样子。
+
+在动手之前想清楚这些，那基本的架子就算是有。接下来就是细节上的事情了，该送入什么参数，具体怎么更新....等等。
+
+# 一对多
+
+这种批量更新跟简单，而且特征也很明显：（1）确定的查询条件（可以是and组合的）能够筛选出所有要更新的记录；（2）这些记录要更新的值或者关键值是一样的。就如同场景1，代码应该如下：
+
+```xml
+<update id="updateMath">
+		update student
+		set math_score = math_score + #{addMathScore}
+		where teacher_id = #{teacherId}
+</update>
+```
+
+`addMathScore` 和 `teacherId` 由 mapper.xml 中的接口送进来就可以了。更新数学成绩的场景很简单，但我觉得这真的需要考量下。采用“多个一对一”的方式给每个学生的数学成绩加10分也是可行的，而且脑子里首先想到的应该也是这种方式。但要真这么干反而麻烦了（先不说两种执行方式效率的快慢），首先得构建个类(student.class)，再生成多个 student object ，这些object 中的 `addMathScore` 是一样的，`studentId` 是各不相同的。这就有种很“浪费”的感觉，也许会想到：可以用单独的变量保存 `addMathScore` ，定义一个 `List<String>` 变量存储所有的 `studentId` ，这样就简单好多了。但等真的动手的时候又会发现，所有的学生Id又得先从数据库中搂出来。在这种场景下，从 class 到 list object生成远没有两个变量来的简单。
+
+在工作中会遇到批量修改名字或者修改某些字段的需求，开发的之前应该主动想一下当前问题否适合这一场景，因为它简洁明了却“藏”在后面。
+
+
+
+# 多个一对一
+
+与上面的对应，这种场景的特征是：（1）唯一确定的where条件只能选出一条记录；（2）而且这些记录更新的值每个都是不一样的。这样只能将 **筛选条件** 和 **要更新的值**封装在对象中，以list object的形式送到MySQL中，最后通过循环的形式更新每条记录。
+
+## 方式一
 
 ```xml
 <update id="updateBatch"  parameterType="java.util.List">  
     <foreach collection="list" item="item" index="index" open="" close="" separator=";">
         update tableName
         <set>
-            name=${item.name},
-            name2=${item.name2}
+            name=#{item.name},
+            name2=#{item.name2}
         </set>
-        where id = ${item.id}
+        where id = #{item.id}
     </foreach>      
 </update>
 ```
 
 先贴上代码，这种更新简洁明了，不在多做解释。不过要注意的是：MySQL 默认不支持多条 SQL 语句执行，所以需要在 MySQL 的 URL 后面添加 `&allowMultiQueries=true` 才能保证上述方式运行成功。还有一点要注意的是，H2 不支持这样的操作，公司项目里本地测境用的是 H2，线上用的是 MySQL，着实被这块小坑了一把。
 
-# 方式二
+## 方式二
 
 ```xml
 <update id="list"  parameterType="java.util.List">
@@ -52,18 +82,15 @@ comments: true
 </update>
 ```
 
-这种方式的批量更新就不需要修改 URL 了。
+这种方式的批量更新就不需要修改 URL 了。（这个实现不是最优的，后面再推敲）
 
 ```xml
 <trim prefix="" suffix="" suffixOverrides="" prefixOverrides=""></trim>
 ```
 
  `prefix:` 如果 trim 中有内容，则在 SQL 语句中加上 prefix 指定的字符串前缀。
-
 `prefixOverrides:` 如果 trim 中有内容，去除 prefixOverrides 指定的多余的前缀内容。
-
- `suffix:` 如果 trim 中有内容，则在 SQL 语句中加上 suffix 指定的字符串后缀。
-
+`suffix:` 如果 trim 中有内容，则在 SQL 语句中加上 suffix 指定的字符串后缀。
 `suffixOverrides`: 如果 trim 中有内容，去除 suffixOverrides 指定的多余的后缀内容。
 
 
@@ -74,8 +101,14 @@ comments: true
 
 
 
-# 方式三
+## 方式三
 
-上述两种方法都是在拼SQL，[他们被一些开发者吐槽是奇技淫巧](https://blog.csdn.net/w605283073/article/details/83064000)。
+上述两种方法都是在拼SQL，[他们被一些开发者吐槽是奇技淫巧](https://blog.csdn.net/w605283073/article/details/83064000)。至于到底什么事奇技淫巧好像没有定义啊，我觉得还是得从场景、效率、可读性来评价当前实现方式的优劣。
 
 mybatis对批量更新提供了正确打开方式：[ExecutorType.BATCH](https://github.com/mybatis/mybatis-3/blob/master/src/test/java/org/apache/ibatis/submitted/batch_keys/BatchKeysTest.java)。
+
+这种方式不适合XML格式的mybatis操作。
+
+# 总结
+
+“磨刀不误砍柴工”，敲代码已经是最后一道工序了，但在动手敲之前需要先想清楚实现功能的代码架子是什么样子，将有疑惑的细节确认清楚，这个很重要。这些都想的差不多了，敲代码就会有底气，效率也会高起来。
