@@ -56,7 +56,9 @@ comments: true
 </update>
 ```
 
-先贴上代码，这种更新简洁明了，不在多做解释。不过要注意的是：MySQL 默认不支持多条 SQL 语句执行，所以需要在 MySQL 的 URL 后面添加 `&allowMultiQueries=true` 才能保证上述方式运行成功。还有一点要注意的是，H2 不支持这样的操作，公司项目里本地测境用的是 H2，线上用的是 MySQL，着实被这块小坑了一把。
+先贴上代码，这种更新简洁明了，使用for循环一条记录update一次，但效率不是很高。注意的是：MySQL 默认不支持多条 SQL 语句执行，所以需要在 MySQL 的 URL 后面添加 `&allowMultiQueries=true` 才能保证上述方式运行成功。还有一点要注意的是，H2 不支持这样的操作，公司项目里本地测境用的是 H2，线上用的是 MySQL，着实被这块小坑了一把。
+
+
 
 ## 方式二
 
@@ -82,7 +84,40 @@ comments: true
 </update>
 ```
 
-这种方式的批量更新就不需要修改 URL 了。（这个实现不是最优的，后面再推敲）
+这种方式使用的SQL的 `case-when-then` 语法实现了批量更新，H2和MySQL都可以执行。
+
+SQL语法原型：
+
+```mysql
+ UPDATE course
+    SET name = CASE id 
+        WHEN 1 THEN 'name1'
+        WHEN 2 THEN 'name2'
+        WHEN 3 THEN 'name3'
+    END, 
+    title = CASE id 
+        WHEN 1 THEN 'New Title 1'
+        WHEN 2 THEN 'New Title 2'
+        WHEN 3 THEN 'New Title 3'
+    END
+WHERE id IN (1,2,3)
+```
+
+这条sql的意思是，如果id为1，则name的值为name1，title的值为New Title1；依此类推，将所有的cast都给摆出来，对号入座。
+
+mybatis拼出来的结果：
+
+```mysql
+update mydata_table 
+	set status = 
+case
+	when id = #{item.id} then #{item.status} end,
+	...
+	when id = id = #{item.id} then #{item.status} end
+	where id in (...);
+```
+
+trim标签：
 
 ```xml
 <trim prefix="" suffix="" suffixOverrides="" prefixOverrides=""></trim>
