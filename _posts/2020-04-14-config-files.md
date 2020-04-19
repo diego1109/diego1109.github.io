@@ -179,7 +179,7 @@ listOfValues：
 
 ### @PropertySource
 
-有时候我们可能会自定义配置文件，专门用来保存某个类的配置，这时需要使用@PropertySource注解先将自定义配置文件加载进来。
+有时候我们可能会**自定义配置文件**，专门用来保存某个类的配置，这时需要使用@PropertySource注解先将自定义配置文件加载进来。
 
 ````properties
 # customConfigProperties.properties配置文件
@@ -230,3 +230,101 @@ CustomConfigProperties(hostName=host@mail.com, port=9000, from=mailer@mail.com, 
 
 ### 实现EnvironmentPostProcessor
 
+**EnvironmentPostProcessor**接口允许用户在Spring Boot应用启动之前操作 `Environment`，[官方参考资料](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-customize-the-environment-or-application-context)。
+
+[这个链接](https://www.baeldung.com/spring-boot-environmentpostprocessor)介绍如何载入和转换自定义的属性到  `Environment`中，并且最后再访问自定义的属性。
+
+**可以用这个接口加载自定义yaml配置文件。**
+
+#### 创建自定义配置文件
+
+创建`person.yml`文件，内容很简单。
+
+````yml
+personconfig:
+  name: lee
+  age: 20
+````
+
+#### 实现EnvironmentPostProcessor接口，加载自定义的配置文件。
+
+这段代码来自官方参考文档。
+
+````java
+public class PersonConfigProcessor  implements EnvironmentPostProcessor {
+
+  private final YamlPropertySourceLoader loader = new YamlPropertySourceLoader();
+
+  @Override
+  public void postProcessEnvironment(ConfigurableEnvironment environment,
+                                     SpringApplication application) {
+    // 加载自定义的配置文件  
+    Resource path = new ClassPathResource("persons.yml"); 
+    PropertySource<?> propertySource = loadYaml(path);
+    environment.getPropertySources().addLast(propertySource);
+
+  }
+
+  private PropertySource<?> loadYaml(Resource path) {
+    if (!path.exists()) {
+      throw new IllegalArgumentException("Resource " + path + " does not exist");
+    }
+    try {
+      return this.loader.load("custom-person", path).get(0);
+    }
+    catch (IOException ex) {
+      throw new IllegalStateException("Failed to load yaml configuration from " + path, ex);
+    }
+  }
+}
+````
+
+#### 将接口的实现类注册
+
+`PersonConfigProcessor` 必须注册到 `META-INF/spring.factories ` 文件中，目的是让Spring Boot在启动时能扫描到这个类，之后才能加载 。
+
+````properties
+org.springframework.boot.env.EnvironmentPostProcessor=com.yang.config.PersonConfigProcessor
+````
+
+#### 构建要绑定的对象
+
+配置文件的目的就是为将其定义的属性注入到java object中，所以还需要构建一个类用来“接”配置文件定义的内容。
+
+````java
+@Component
+@ConfigurationProperties(prefix = "personconfig")
+@ToString
+@Setter
+public class PersonConfig {
+  private String name;
+  private int age;
+}
+````
+
+这里的`@Setter` 不能省略，这种方式也是：先调用无参构造函数构造对象，再调用属性的set方法初始化。使用PersonConfig时，直接装配就可以了。
+
+````java
+@Autowired
+private PersonConfig personConfig;
+````
+
+测试结果：
+
+````java
+PersonConfig(name=lee, age=20)
+````
+
+
+
+## 小结：
+
+1. 如果不需要配置文件，直接注入，使用 `@Value`注解。
+2. 用到了配置文件，但注入的都是单个属性值，将要注入的属性写在在 `application.properties/application.yml` 中，用`@Value ${}`方式注入。
+3. 用到了配置文件，但注入的是个object，将要注入的object写在 `application.properties/application.yml` 中，用 `@ConfigurationProperties` 注入。
+4. 自定义properties配置文件，选用`@PropertySource` 注入。
+5. 自定义yaml配置文件，选用“实现EnvironmentPostProcessor”的方式注入。
+
+其实，4和5的注入方式都是先将配置文件加载进来，再用@ConfigurationProperties绑定类。只是不同类型的文件，加载的方式不一样。
+
+[github](https://github.com/diego1109/Spring-Boot-demo/tree/master/spring-boot-config)
