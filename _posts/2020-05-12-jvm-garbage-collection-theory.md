@@ -62,7 +62,7 @@ comments: true
 
 一般会把java堆分成 `新生代（Young Generation）` 和 `老年代（Old Generation）` 两个区域，新生代中每次垃圾回收时都会有大批的对象死去，而每次回收后存活的对象会逐步的晋升到老年代中存放（很显然，刚new出来的对象肯定是分配到新生代中的）。垃圾回收器根据区域中对象的消亡情况安排相应的收集算法，从而就有了：标记-清除、标记-复制、标记整理算法。如下图所示：
 
-<div align="center"><img src="../images/generational-collection.png" ></div>
+<div align="center"><img src="http://qa76b4goj.bkt.clouddn.com/generational-collection.png" ></div>
 
 ### 标记-清除算法（Mark-Sweep）
 
