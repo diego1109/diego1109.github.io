@@ -41,5 +41,5 @@ java程序执行 `new Object()` 时就是要创建对象了。java虚拟机收�
 
 
 
-<div align="center"><img src="../images/access-object-with-reference.png"> </div>
+<div align="center"><img src="http://qa76b4goj.bkt.clouddn.com/access-object-with-reference.png?e=1589366837&token=steHWm1dnWLfXrfjTob-0NTAgjvCFOMPkt9lfnyq:oNgDGvJdayp0gWIsJ8x-rMWFIWA="> </div>
 
