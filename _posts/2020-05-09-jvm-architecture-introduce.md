@@ -15,7 +15,7 @@ comments: true
 
 jvm架构主要分为三个子系统：类加载子系统、运行时数据区域和执行引擎。[简单介绍](https://dzone.com/articles/jvm-architecture-explained)。
 
-<div align="center"><img src="http://qa76b4goj.bkt.clouddn.com/jvm-architecture.png"></div>
+<div align="center"><img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/jvm-architecture.png"></div>
 
 - `类加载子系统（ClassLoader Subsystem）`：实现java类的**动态加载**功能，当java程序在运行时第一次引用某个类，类加载系统就**加载**、**连接**并且**初始化**这个类对应的class文件。而不是在**编译期**就做这些事情。
 - `运行时数据区（Runtime Data Area）`：java字节码将分配到这个区域，具体介绍如下。
