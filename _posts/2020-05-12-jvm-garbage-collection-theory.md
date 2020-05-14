@@ -1,6 +1,6 @@
 ---
 layout: post
-title: jvm-垃圾收集器
+title: jvm-垃圾收集机制
 date: 2020-05-12
 categories: 学习笔记
 tags: Jvm
