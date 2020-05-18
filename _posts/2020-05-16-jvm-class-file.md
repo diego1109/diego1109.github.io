@@ -11,5 +11,9 @@ comments: true
 
 ## class文件整体结构
 
+<div align="center">
+    <img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/jvm-class-file.png">
+</div>
+
 ## class文件中各个部分的作用
 
