@@ -28,8 +28,6 @@ class文件中的基本结构如下图所示：
 文章中使用如下代码介绍class文件中的各个部分：
 
 ````java
-package geym.zbase.ch9;
-
 public class SimpleUser {
 
   public static final int TYPE = 1;
@@ -58,6 +56,18 @@ public class SimpleUser {
   }
 }
 
+````
+
+执行命令，将java文件编译class文件
+
+````shell
+javac SimpleUser.java
+````
+
+再执行命令，将二进制格式的class文件以十六进制打开。
+
+````shell
+hexdump SimpleUser.class
 ````
 
 编译成对应的class文件的十六进制合适如下所示，java文件编异常class文件后，里面的内容就长这个样子。
@@ -96,20 +106,133 @@ public class SimpleUser {
 
 等等，这些”常量“的名称和描述符都是按一定的规范写死在常量池中的，程序运行时不可能发生变化。当虚拟机在做类加载时，将会从常量池中获得对应的符号引用，再在类创建时或者运行时解析、翻译当具体的内存地址中。（简单理解就是，开发者写的类、字段、方法都存放在了这个地方，虚拟机运行时自己会来找并且解析的）
 
-直到目前，总共有17中不同的类型的常量，每种常量都是一个独立的数据结构。常量池类型如下图所示：
+直到目前，总共有17中不同的类型的常量，每种常量都是一个独立的数据结构，（在常量池中的其他部分会存出现指向这些数据节结构的索引）。常量池类型如下图所示：
 
 
 
 <div align="center">
     <img src="/Users/lyy/Documents/diego1109.github.io/images/constant-pool-kinds.png" style="zoom:80%;" />
 </div>
-
-[网上找的17种常量类型总表](https://blog.csdn.net/qq_39375211/article/details/79925127)，从这里可以看出，常量池中保存了，常量的长度、名称、字面量值、符号引用的索引等信息。
+[网上找的17种常量类型总表](https://blog.csdn.net/qq_39375211/article/details/79925127)，从这里可以看出，常量池中保存了，常量的长度、名称、字面量值、符号引用的索引(类中字段如果引用类型，则用索引指向该符号引用真正所在的地方)等信息。
 
 ### 访问标志
 
-常量池之后紧跟着就是访问标志了，这个理解起来就容易多了。这个标志用来表示Class是接口还是类，以及它的修饰符是什么，是否被声明为final，等等。
+常量池之后紧跟着就是访问标志了，占1个字节。这个标志用来表示Class是接口还是类，以及它的修饰符是什么，是否被声明为final，等等。
 
 ### 当前类、父类和接口
 
-访问标记结束后，会指定该类的类别、父类类别以及实现的接口。this class用一个字节表示，super class用一个字节表示，因为一个类可以实现多个接口，因此需要以数组的形式保存多个接口的索引。
+访问标记结束后，会指定该类的类别、父类类别以及实现的接口。格式如下：
+
+````c
+u2	this_class;
+u2	super_class;
+u2  interfaces_count;
+u2  interfaces[interfaces_count];
+````
+
+
+
+this_class 和 super_class都是2字节无符号整数，他们指向常量池中的CONSTANT_Class，以表示当前的类和父类 ，因为一个类可以实现多个接口，因此需要以数组的形式保存多个接口的索引。
+
+### 类的字段
+
+在类描述后，会有类的字段信息。因为一个有多个字段，所以需要先指明字段的个数。
+
+````c
+u2 fileds_count;
+field_info	fileds[fields_count]
+````
+
+fileds_countb是2字节无符号整数，表示字段的数量。field_info表示字段的具体信息：
+
+````C
+field_info {
+    u2	access_flags;
+    u2	name_index;
+    u2	descriptor_index;
+    u2	attributes_count;
+    attributes_info	attributes[attributes_count]
+}
+````
+
+- access_flags: 访问标记，该字段是public还是private，或者.......。
+- name_index: 字段的名字，不是直接存储名字，而是这块存放了一个指向常量池中的CONSTANT_Utf8结构的索引。
+
+- descriptor_index：表示字段的类型，这块也是个索引，指向了常量池中的一个CONSTANT_Utf8结构数据。
+
+类的字段部分所包含的固定数据项到descriptor_index为止就全部结束了。后面紧跟的attributes_count、attributes_info[attributes_count]是属性表集合，用来存储一些额外的信息，比如，某个int类型的属性有初始值，那么这个属性集合就会被用到了。
+
+### 类的方法
+
+class文件对于类的方法的描述和字段的描述用了几乎完全一致的方式。类的方法信息由两部分构成：
+
+````C
+u2 method_count;
+method_info	methods[method_count]
+````
+
+method_info表示字段的具体信息：
+
+````C
+method_info {
+    u2	access_flags;
+    u2	name_index;
+    u2	descriptor_index;
+    u2	attributes_count;
+    attributes_info	attributes[attributes_count]
+}
+````
+
+方法表的结构如同字段表一样，依次包括访问标志、名称索引、描述符索引、属性表集合。方法的定义可以通过前面这四个信息来表达清楚，那方法里面的代码去哪里了呢？方法里的java代码，经过javac编译器译成字节码指令后，存放在方法属性表集合中一个名为”Code“的属性里面。
+
+### 类的属性
+
+属性表（attribute_info）会在多个场合出现，class文件、方法表、字段表都可以携带自己的属性表集合，以描述某些场景专有的信息。为了能正确解析Class文件，期初只定义了9项属性，知道Java SE 12版本中，预定以属性已经增加到了29项。这块只介绍属性表集合中Code属性以及跟它相关的属性，下表中只是罗列了29项属性中其中4项：
+
+| 属性名称           | 使用位置 | 含义                                                         |
+| ------------------ | -------- | ------------------------------------------------------------ |
+| Code               | 方法表   | java代码编译成的字节码指令                                   |
+| LineNumberTable    | Code属性 | Java源码的行号与字节码指令的对应关系                         |
+| LocalVariableTable | Code属性 | 方法的局部变量描述                                           |
+| StackMapTable      | Code属性 | JDK 6中新增的属性，供新的类型检查验证器检查和处理目标方法的局部变量和操作数栈所需要的类型是否匹配 |
+
+上表的第二列”使用位置“意思是：class文件由大概11个基本结构组成，这个属性会在哪个基本结构中出现。上表的意思是：表中第一行显示Code属性会在方法表中出现，其余三个属性将会在Code属性中出现。
+
+#### code属性
+
+在类的方法那部分提到过，java程序方法体里面的代码经过javac编译器处理后，最终会变成字节码指令存储在Code属性内。Code属性出现在方法表的属性集合之中，但并非所有的方法表都必须存在这个属性，比如接口或者抽象类的方法中就不存在Code属性，如果方法表中有Code属性存在，那么它的结构将如下表所示：
+
+| 类型           | 名称                   | 数量                   |
+| -------------- | ---------------------- | ---------------------- |
+| u2             | attribute_name_index   | 1                      |
+| u4             | attribute_length       | 1                      |
+| u2             | max_stack              | 1                      |
+| u2             | max_locals             | 1                      |
+| u4             | code_length            | 1                      |
+| u1             | code                   | code_length            |
+| u2             | exception_table_length | 1                      |
+| exception_info | exception_table        | exception_table_length |
+| u2             | attributes_count       | 1                      |
+| attribute_info | attributes             | attributes_count       |
+
+- **attribute_name_index** 是一项指向CONSTANT_Utf8_info型常量的索引，此常量值固定为”Code“，它代表了该属性的属性名称。
+
+- attribute_length表示属性的长度。
+
+- max_stack代表了操作数栈深度的最大值。在方法执行的任意时刻，操作数栈都不会超过这个最大深度。虚拟机在运行时需要根据这个值来分配栈帧中操作数栈深度。
+
+- max_locals代表了局部变量表所需的存储空间。max_locals的单位是变量槽（Slot），变量槽是局部变量分配内存所使用的最小单位。对于byte、char、float、int、short、boolean和returnAddress等长度不大于32位的数据类型，每个局部变量占用一个槽，double和long这种64位长度的数据类型则需要两个槽来存放。
+
+    java虚拟机会将局部变量表中的变量槽进行重用，当代码执行超出一个局部变量表的作用域时，这个局部变量表占用的变量槽可以被其他的局部变量表使用，javac编译器会根据变量做用户来分配变量槽给各个变量使用。
+
+- code_length 代表字节码长度。
+
+- code 用来存储java源程序编译后生成的字节码指令。
+
+- exception_table_length和exception_table表示显式异常表，异常表对于Code来说并不是必须存在的（有些方法没有显式抛异常）。异常处理表告诉一个方法该如何处理字节码中可能抛出的异常。
+
+到现在为止，Code属性的主体部分就介绍完了，但是Code属性中还包含更多的信息，这些信息都以属性的形式内嵌在Code属性中，除了类、方法、字段可以内嵌属性外，属性本身也可以内嵌属性。Code属性的中的attribute_info属性就里就包含着 **LocalVariableTable** 、**LineNumberTable** 和 **StackMapTable**。
+
+- **LineNumberTable** 用来记录字节码偏移量和行号的对应关系，在软件调试时，该属性有至关重要的作用，若没有它，调试器无法定位到对应的源码。
+-  **LocalVariableTable** 这是局部变量表，它记录了一个方法中所有的局部变量。（java程序运行时，这货在栈帧中躺着）。
+- **StackMapTable** 在Class文件做类型校验时会用到该文件。

@@ -1,0 +1,143 @@
+Classfile /Users/lyy/Downloads/SimpleUser.class
+  Last modified 2020-5-19; size 843 bytes
+  MD5 checksum e8e5533b6d52a9ea22f0bc071936212b
+  Compiled from "SimpleUser.java"
+public class SimpleUser
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #9.#34         // java/lang/Object."<init>":()V
+   #2 = Fieldref           #8.#35         // SimpleUser.id:I
+   #3 = Class              #36            // java/lang/IllegalStateException
+   #4 = Fieldref           #37.#38        // java/lang/System.out:Ljava/io/PrintStream;
+   #5 = Methodref          #3.#39         // java/lang/IllegalStateException.toString:()Ljava/lang/String;
+   #6 = Methodref          #40.#41        // java/io/PrintStream.println:(Ljava/lang/String;)V
+   #7 = Fieldref           #8.#42         // SimpleUser.name:Ljava/lang/String;
+   #8 = Class              #43            // SimpleUser
+   #9 = Class              #44            // java/lang/Object
+  #10 = Utf8               TYPE
+  #11 = Utf8               I
+  #12 = Utf8               ConstantValue
+  #13 = Integer            1
+  #14 = Utf8               id
+  #15 = Utf8               name
+  #16 = Utf8               Ljava/lang/String;
+  #17 = Utf8               <init>
+  #18 = Utf8               ()V
+  #19 = Utf8               Code
+  #20 = Utf8               LineNumberTable
+  #21 = Utf8               getId
+  #22 = Utf8               ()I
+  #23 = Utf8               setId
+  #24 = Utf8               (I)V
+  #25 = Utf8               StackMapTable
+  #26 = Class              #36            // java/lang/IllegalStateException
+  #27 = Utf8               Exceptions
+  #28 = Utf8               getName
+  #29 = Utf8               ()Ljava/lang/String;
+  #30 = Utf8               setName
+  #31 = Utf8               (Ljava/lang/String;)V
+  #32 = Utf8               SourceFile
+  #33 = Utf8               SimpleUser.java
+  #34 = NameAndType        #17:#18        // "<init>":()V
+  #35 = NameAndType        #14:#11        // id:I
+  #36 = Utf8               java/lang/IllegalStateException
+  #37 = Class              #45            // java/lang/System
+  #38 = NameAndType        #46:#47        // out:Ljava/io/PrintStream;
+  #39 = NameAndType        #48:#29        // toString:()Ljava/lang/String;
+  #40 = Class              #49            // java/io/PrintStream
+  #41 = NameAndType        #50:#31        // println:(Ljava/lang/String;)V
+  #42 = NameAndType        #15:#16        // name:Ljava/lang/String;
+  #43 = Utf8               SimpleUser
+  #44 = Utf8               java/lang/Object
+  #45 = Utf8               java/lang/System
+  #46 = Utf8               out
+  #47 = Utf8               Ljava/io/PrintStream;
+  #48 = Utf8               toString
+  #49 = Utf8               java/io/PrintStream
+  #50 = Utf8               println
+{
+  public static final int TYPE;
+    descriptor: I
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+    ConstantValue: int 1
+
+  public SimpleUser();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 1: 0
+
+  public int getId();
+    descriptor: ()I
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: getfield      #2                  // Field id:I
+         4: ireturn
+      LineNumberTable:
+        line 9: 0
+
+  public void setId(int) throws java.lang.IllegalStateException;
+    descriptor: (I)V
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=3, args_size=2
+         0: aload_0
+         1: iload_1
+         2: putfield      #2                  // Field id:I
+         5: goto          19
+         8: astore_2
+         9: getstatic     #4                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        12: aload_2
+        13: invokevirtual #5                  // Method java/lang/IllegalStateException.toString:()Ljava/lang/String;
+        16: invokevirtual #6                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        19: return
+      Exception table:
+         from    to  target type
+             0     5     8   Class java/lang/IllegalStateException
+      LineNumberTable:
+        line 14: 0
+        line 17: 5
+        line 15: 8
+        line 16: 9
+        line 18: 19
+      StackMapTable: number_of_entries = 2
+        frame_type = 72 /* same_locals_1_stack_item */
+          stack = [ class java/lang/IllegalStateException ]
+        frame_type = 10 /* same */
+    Exceptions:
+      throws java.lang.IllegalStateException
+
+  public java.lang.String getName();
+    descriptor: ()Ljava/lang/String;
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: getfield      #7                  // Field name:Ljava/lang/String;
+         4: areturn
+      LineNumberTable:
+        line 21: 0
+
+  public void setName(java.lang.String);
+    descriptor: (Ljava/lang/String;)V
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=2, args_size=2
+         0: aload_0
+         1: aload_1
+         2: putfield      #7                  // Field name:Ljava/lang/String;
+         5: return
+      LineNumberTable:
+        line 25: 0
+        line 26: 5
+}
+SourceFile: "SimpleUser.java"
