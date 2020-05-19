@@ -70,12 +70,14 @@ javac SimpleUser.java
 hexdump SimpleUser.class
 ````
 
-编译成对应的class文件的十六进制合适如下所示，java文件编异常class文件后，里面的内容就长这个样子。
+编译成对应的class文件的十六进制合适如下所示，java文件编异常class文件后，里面的内容就长这个样子,除了开头几个字节一眼能看明白是什么意思，其他的都得推算。
 
 <div align="center">
     <img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/user_simple2.png">
 </div>
+使用javap反编译工具，可以直观的查看字节码中所描述的信息。
 
+执行命令 `javap -verbose SimpleUser` 得到的结果在链接里。
 
 ## class文件中各个部分的作用
 
