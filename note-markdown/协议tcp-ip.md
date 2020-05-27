@@ -32,7 +32,9 @@ OSI模型将通信协议中必要的模型分成7层，通过这些分层，使�
 
 ### 2.4.1 TCP/IP与OSI参考协议模型
 
-![](/Users/lyy/Documents/diego1109.github.io/images/tco-ip-and-osi.png)
+<div align="center">
+    <img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/tco-ip-and-osi.png">
+</div>
 
 **硬件（物理层）**：TCP/IP的最底层是的负责数据传输的硬件。这种硬件就相当于以太网或电话线路等物理层的设备。**TCP/IP是在网络互连的设备之间能够通信的前提下才被提出的协议。**
 
@@ -65,9 +67,9 @@ OSI模型将通信协议中必要的模型分成7层，通过这些分层，使�
 
 假设甲给乙发送电子邮件，内容为：“早上好”。而从TCP/IP通信上看，是从一台计算机A想另外一台计算机B发送电子邮件。我们通过这个例子来认识下TCP/IP 通信的过程
 
-![](https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/tcp-ip-send-email.png)
-
-
+<div align="center">
+    <img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/tcp-ip-send-email.png">
+</div>
 
 1. 应用程序员处理（这块涉及应用层、表示层、会话层）
 
@@ -97,13 +99,15 @@ OSI模型将通信协议中必要的模型分成7层，通过这些分层，使�
 
     从网络层传输过来的IP包，对于以太网驱动来说不过就是数据。给这数据附加上以太网首部并进行发送处理。以太网首部中包含：接收端MAC地址、发送端MAC地址和标志以太网类型的以太网数据的协议。**根据上述信息产生的以太网数据包将通过物理层传输给接收端**。
 
-    ![data-link-layer](https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/data-link-layer.png)
+    <div align="center">
+    <img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/data-link-layer.png">
+    </div>
 
     分组数据包，经过以太网的数据链路层时的大致流程如上图所示（对各个包首部做了简化）。包流动时，从前往后依次被附加了以太网包首部、IP包首部、TCP包首部以及应用程序自己的包首部和数据。而包的最后则追加了以太网包尾。
 
     每个包首部中至少会包含两个信息：一个是发送端和接收端地址，另一个是上一层协议的类型。
 
     进过每个协议分层时，都必须有识别包发送端和接收端的信息。以太网会用MAC地址，IP会用IP地址，TCP会用端口号识别两主机的地址。即使在应用程序中，像电子邮件地址这样的信息也是一种地址标识。这些地址信息都会在每个包经由各个分层时，附加到协议对应的包首部里面。
-
+    
     此外，每个包首部中还包含一个识别位，它是用来表示上一层协议的种类信息。例如以太网的包首部中的以太网类型，IP中的协议类型，TCP/UDP中两个端口的端口号等都起着识别类型的作用。就是在应用的首部信息中，有时也会包含一个用来识别其数据类型的标签。
 
