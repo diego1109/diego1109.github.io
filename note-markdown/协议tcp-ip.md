@@ -32,9 +32,7 @@ OSI模型将通信协议中必要的模型分成7层，通过这些分层，使�
 
 ### 2.4.1 TCP/IP与OSI参考协议模型
 
-<div align="center">
-    <img src="https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/tco-ip-and-osi.png>
-</div>
+![](/Users/lyy/Documents/diego1109.github.io/images/tco-ip-and-osi.png)
 
 **硬件（物理层）**：TCP/IP的最底层是的负责数据传输的硬件。这种硬件就相当于以太网或电话线路等物理层的设备。**TCP/IP是在网络互连的设备之间能够通信的前提下才被提出的协议。**
 
@@ -68,6 +66,8 @@ OSI模型将通信协议中必要的模型分成7层，通过这些分层，使�
 假设甲给乙发送电子邮件，内容为：“早上好”。而从TCP/IP通信上看，是从一台计算机A想另外一台计算机B发送电子邮件。我们通过这个例子来认识下TCP/IP 通信的过程
 
 ![](https://cdn.jsdelivr.net/gh/diego1109/diego1109.github.io/images/tcp-ip-send-email.png)
+
+
 
 1. 应用程序员处理（这块涉及应用层、表示层、会话层）
 
